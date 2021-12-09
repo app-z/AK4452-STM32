@@ -1,0 +1,4 @@
+WavePlayer.cpp:13:7:void myMain()	0	static
+WavePlayer.cpp:18:7:void setLevel(int16_t)	8	static
+WavePlayer.cpp:23:7:void process(int16_t*, int32_t)	16	static
+WavePlayer.cpp:27:1:cpp)	24	static

@@ -1,0 +1,7 @@
+audioplay.c:74:6:Error	0	static
+audioplay.c:79:9:CODEC_IO_Write	48	static
+audioplay.c:104:6:AudioPlay_Stop	8	static
+audioplay.c:119:6:AudioPlay_Start	32	static
+audioplay.c:181:13:shift_level	4	static
+audioplay.c:192:6:AudioPlay_HalfTransfer_Callback	0	static
+audioplay.c:197:6:AudioPlay_Transfer_Callback	4	static
