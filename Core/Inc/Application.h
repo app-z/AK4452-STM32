@@ -5,16 +5,18 @@
  */
 
 #pragma once
+extern "C" {
 
-#include "main.h"
-#include "../../Middlewares/ST/STM32_Audio/Addons/SVC/Inc/svc_glo.h"
+   #include "main.h"
+   #include "greq_glo.h"
+   #include "svc_glo.h"
 
-extern I2S_HandleTypeDef hi2s2;
+	extern I2S_HandleTypeDef hi2s2;
+}
 
 // include our classes
-
 #include "VolumeControl.h"
-//#include <GraphicEqualizer.h>
+#include "GraphicEqualizer.h"
 #include "Audio.h"
 #include "Program.h"
 

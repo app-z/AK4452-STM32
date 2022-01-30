@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include "audioplay.h"
+//#include "audioplay.h"
 
 /**
  * Audio management functionality. Many of the methods in here are called from the
  * usbd_audio_if.cpp file.
  */
 
-extern uint8_t Audio_Buffer[AUDIO_BUFFER_SIZE];
+//extern uint8_t Audio_Buffer[AUDIO_BUFFER_SIZE];
 
 
 class Audio {
@@ -26,11 +26,12 @@ class Audio {
     int16_t *_sendBuffer;
 
     VolumeControl &_volumeControl;
+    GraphicEqualizer &_graphicEqualiser;
     bool _running;
     uint8_t _zeroCounter;
 
   public:
-    Audio(VolumeControl &volumeControl);
+    Audio(VolumeControl &volumeControl, GraphicEqualizer &graphicEqualiser);
 
   public:
     static Audio *_instance;
@@ -46,6 +47,8 @@ class Audio {
     int8_t pause();
     int8_t resume();
 
+    const GraphicEqualizer& getGraphicEqualizer() const;
+
   private:
     void processData(volatile int offset);
 };
@@ -54,8 +57,9 @@ class Audio {
  * Constructor
  */
 
-inline Audio::Audio(VolumeControl &volumeControl) :
-    _volumeControl(volumeControl) {
+inline Audio::Audio(VolumeControl &volumeControl,  GraphicEqualizer &graphicEqualiser) :
+    _volumeControl(volumeControl), _graphicEqualiser(graphicEqualiser) {
+
 
   // initialise variables
 
@@ -69,6 +73,10 @@ inline Audio::Audio(VolumeControl &volumeControl) :
 //  _processBuffer = new int16_t[AUDIO_BUFFER_SIZE];         // 1920 bytes
 //  _sendBuffer = new int16_t[AUDIO_BUFFER_SIZE];            // 1920 bytes
 
+}
+
+inline const GraphicEqualizer& Audio::getGraphicEqualizer() const {
+  return _graphicEqualiser;
 }
 
 /**

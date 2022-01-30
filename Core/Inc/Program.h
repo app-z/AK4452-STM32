@@ -16,6 +16,7 @@ class Program {
 
     Audio _audio;
     VolumeControl _volumeControl;
+    GraphicEqualizer _graphicEqualiser;
 
   public:
     Program();
@@ -27,7 +28,7 @@ class Program {
 };
 
 inline Program::Program() :
-    _audio(_volumeControl) {
+    _audio(_volumeControl, _graphicEqualiser) {
 }
 
 inline void Program::setLevel(int16_t level) {

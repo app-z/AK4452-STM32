@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include "audioplay.h"
 #include "fatfs.h"
-#include <stdio.h>
+#include "greq_glo.h"
+
 //------------------------------------------------------
 #define I2S_STANDARD                  I2S_STANDARD_PHILIPS
 
@@ -63,6 +65,7 @@ extern WAVE_FormatTypeDef *waveformat;
 AUDIO_StateMachine     Audio;
 uint32_t samplerate;
 
+greq_dynamic_param_t *pEqualizerParams;
 
 ApplicationTypeDef Appli_state = APPLICATION_IDLE;
 char str2[20];

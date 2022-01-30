@@ -36,7 +36,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "audio_fw_glo.h"
+#include "../../Common/Inc/audio_fw_glo.h"
 
 /* Exported constants --------------------------------------------------------*/
 
