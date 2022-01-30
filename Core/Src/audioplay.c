@@ -90,6 +90,34 @@ uint8_t CODEC_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value)
 	return result;
 }
 
+//---------------------------------------------------------------------
+
+void write_register(uint8_t dev_addr, uint8_t register_pointer, uint8_t register_value)
+{
+    uint8_t data[2];
+
+    data[0] = register_pointer;
+    data[1] = register_value;    // MSB byte of 16bit data
+
+    HAL_I2C_Master_Transmit(&hi2c1, dev_addr, data, 2, 100);  // data is the start pointer of our array
+}
+
+void read_register(uint8_t dev_addr, uint8_t register_pointer, uint8_t* receive_buffer)
+{
+    // first set the register pointer to the register wanted to be read
+    HAL_I2C_Master_Transmit(&hi2c1, dev_addr, &register_pointer, 1, 100);  // note the & operator which gives us the address of the register_pointer variable
+
+    // receive the 2 x 8bit data into the receive buffer
+    HAL_I2C_Master_Receive(&hi2c1, dev_addr, receive_buffer, 1, 100);
+}
+
+void set_volume(uint8_t volume){
+	  write_register(0x20, 0x3, volume);
+	  HAL_Delay(3);
+	  write_register(0x20, 0x4, volume);
+}
+
+
 //------------------------------------------------------
 //void AudioPlay_Init(uint32_t AudioFreq)
 //{
@@ -121,6 +149,11 @@ void AudioPlay_Start(uint32_t AudioFreq)
 	offsetpos=44;
 	cnt=0;
 	UINT bytesread=0;
+
+	uint8_t level = 0xd0;
+	uint32_t tickstart = HAL_GetTick();
+	uint32_t delay_volume_control = 50;
+
 	AudioTotalSize=waveformat->FileSize;
 	/*Get Data from USB Flash Disk*/
 	WaveDataLength=waveformat->FileSize;
@@ -133,9 +166,10 @@ void AudioPlay_Start(uint32_t AudioFreq)
 									DMA_MAX(AUDIO_BUFFER_SIZE/AUDIODATA_SIZE));
 	}
 
-	setLevel(-65);
+	  set_volume(level);
+//	setLevel(-12);
 
-	char level = 0;
+//	char level = 0;
 	/*Check if the device is connected*/
 	while(AudioRemSize!=0)
 	{
@@ -143,9 +177,9 @@ void AudioPlay_Start(uint32_t AudioFreq)
 		{
 			f_read(&WavFile,&Audio_Buffer[0], AUDIO_BUFFER_SIZE/2,(void*)&bytesread);
 
-			process((int16_t*)&Audio_Buffer[0], AUDIO_BUFFER_SIZE/4/2);
+//			process((int16_t*)&Audio_Buffer[0], AUDIO_BUFFER_SIZE/4/2);
 
-			if (level > 0) shift_level(0, AUDIO_BUFFER_SIZE/2, level);
+//			if (level > 0) shift_level(0, AUDIO_BUFFER_SIZE/2, level);
 
 			buffer_offset=BUFFER_OFFSET_NONE;
 			AudioRemSize-=bytesread;
@@ -155,24 +189,34 @@ void AudioPlay_Start(uint32_t AudioFreq)
 			f_read(&WavFile,&Audio_Buffer[AUDIO_BUFFER_SIZE/2],
 							AUDIO_BUFFER_SIZE/2,(void*)&bytesread);
 
-			process((int16_t*)&Audio_Buffer[AUDIO_BUFFER_SIZE/2], AUDIO_BUFFER_SIZE/4/2);
+//			process((int16_t*)&Audio_Buffer[AUDIO_BUFFER_SIZE/2], AUDIO_BUFFER_SIZE/4/2);
 
-			int offs = AUDIO_BUFFER_SIZE/2;
-			if (level > 0) shift_level(offs, AUDIO_BUFFER_SIZE, level);
+//			int offs = AUDIO_BUFFER_SIZE/2;
+//			if (level > 0) shift_level(offs, AUDIO_BUFFER_SIZE, level);
 
 			buffer_offset=BUFFER_OFFSET_NONE;
 			AudioRemSize-=bytesread;
 		}
-		if(AudioRemSize<0)
+		if(AudioRemSize<100)
 		{
 			AudioRemSize=0;
 			dur=0;
 			sprintf((char*)str3, "%02d:%02d", (int)(dur/60),(int)dur%60);
 			AudioPlay_Stop();
 		}
-//		LCD_SetPos(0,3);
-//		LCD_String(str2);
-//		LCD_String(str3);
+
+		uint32_t time_delay = HAL_GetTick() - tickstart;
+		if (time_delay > delay_volume_control) {
+			tickstart = HAL_GetTick();
+
+			if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == GPIO_PIN_RESET) {
+				if (level < 0xff) set_volume(level++);
+			}
+			if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2) == GPIO_PIN_RESET) {
+				if (level > 0) set_volume(level--);
+			}
+		}
+
 	}
 //	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
 	AudioPlay_Stop();

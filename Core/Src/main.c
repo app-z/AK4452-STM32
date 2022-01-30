@@ -76,26 +76,6 @@ const char* fname = "44100_2.wav";
 //const char* fname = "3.wav";
 
 
-//---------------------------------------------------------------------
-
-void write_register(uint8_t dev_addr, uint8_t register_pointer, uint8_t register_value)
-{
-    uint8_t data[2];
-
-    data[0] = register_pointer;
-    data[1] = register_value;    // MSB byte of 16bit data
-
-    HAL_I2C_Master_Transmit(&hi2c1, dev_addr, data, 2, 100);  // data is the start pointer of our array
-}
-
-void read_register(uint8_t dev_addr, uint8_t register_pointer, uint8_t* receive_buffer)
-{
-    // first set the register pointer to the register wanted to be read
-    HAL_I2C_Master_Transmit(&hi2c1, dev_addr, &register_pointer, 1, 100);  // note the & operator which gives us the address of the register_pointer variable
-
-    // receive the 2 x 8bit data into the receive buffer
-    HAL_I2C_Master_Receive(&hi2c1, dev_addr, receive_buffer, 1, 100);
-}
 
 //---------------------------------------------------------------------
 
@@ -148,6 +128,8 @@ void GetFileInfo(void)
                 f_close(&WavFile);
         }
 }
+
+
 //-----------------------------------------------------
 
 //extern void myMain();
@@ -201,7 +183,7 @@ int main(void)
   HAL_Delay(50);
 
   read_register(0x20, 0x0, &control_test);
-
+  HAL_Delay(50);
 
   FRESULT res = f_mount(&SDFatFs, (TCHAR const*)SDPath, 1);
 
@@ -408,6 +390,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PC0 PC2 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB0 */
   GPIO_InitStruct.Pin = GPIO_PIN_0;

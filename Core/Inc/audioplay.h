@@ -64,6 +64,12 @@ void AudioPlay_Start(uint32_t AudioFreq);
 void AudioPlay_HalfTransfer_Callback(void);
 void AudioPlay_Transfer_Callback(void);
 //------------------------------------------------
+
+void write_register(uint8_t dev_addr, uint8_t register_pointer, uint8_t register_value);
+void read_register(uint8_t dev_addr, uint8_t register_pointer, uint8_t* receive_buffer);
+void set_volume(uint8_t  volume);
+
+
 #ifdef __cplusplus
 }
 #endif
